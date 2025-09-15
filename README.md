@@ -5,7 +5,7 @@ This repository includes the Class 1 survey dataset and R code used to analyze i
 
 ## Files Included
 - `class1_survey.csv`: Cleaned version of the Class 1 survey dataset
-- `analysis_code.R`: R script used to summarize and visualize the data
+- `class1_analysis.Rmd`: R script used to summarize and visualize the data
 - `README.md`: This file
 
 ## What the Code Does
@@ -16,7 +16,7 @@ This repository includes the Class 1 survey dataset and R code used to analyze i
 
 ## How to Run the Code
 1. Download or clone this repository to your computer
-2. Open `analysis_code.R` in RStudio
+2. Open `class1_analysis.Rmd` in RStudio
 3. Make sure your working directory is set to the folder where the files are saved
 4. Run the script
 
