@@ -1,0 +1,159 @@
+---
+title: "ADA_Lab1"
+author: "Alaina Flory"
+date: "2025-08-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+
+```
+
+## 1
+
+Import class one survey data from our Github site (https://github.com/kijohnson/Advanced-Data-Analysis) (The dataset is called ‘Class 1 Survey Fall 2025 2.csv’), calling the R dataframe that you create C1survey.
+
+```{r}
+
+C1survey <- read.csv("https://github.com/kijohnson/Advanced-Data-Analysis/raw/refs/heads/main/Class%201%20Survey%20Fall%202025%202.csv")
+
+```
+
+## 2
+
+Determine: a. the number of observations (i.e. the number of people who filled out the survey) and b. the number of variables in the dataframe.
+
+```{r}
+##number of observations and variable
+
+dim(C1survey)
+
+## 58 observations, 27 variables
+
+```
+
+## 3
+a. Rename the column variables to something shorter and that is descriptive of what the variable is about (for example like_dogs for the ‘Do you like dogs?’ question variable) and b. Display that they are renamed. Hints: You can use either the rename_with function or the names function. The list of names for time is:
+“id”, “like_cats”, “like_dogs”, “have_desert”, “slogan”, “fav_day”, “larkORowl”, “fav_food”, “fav_drink”, “fav_season”, “fav_month”, “hobby”, “program”, “specialization”, “stat_software”, “R_exp”, “coding_comfort”, “coding_length”, “top_three”, “public_health_interest”, “fav_num”, “bday”, “bmonth”, “country”, “state”, “city”, “highest_educ_level”
+
+```{r}
+
+##renaming columns with new names
+
+names(C1survey)[1:27] <- c("id", "like_cats", "like_dogs", "have_desert", "slogan", "fav_day", "larkORowl", "fav_food", "fav_drink", "fav_season", "fav_month", "hobby", "program", "specialization", "stat_software", "R_exp", "coding_comfort", "coding_length", "top_three", "public_health_interest", "fav_num", "bday", "bmonth", "country", "state", "city", "highest_educ_level")
+
+```
+
+## 4
+
+Write code to determine and display the number of factor, integer, numerical, and character variables there are in the C1survey dataset. Suggestion: Try to ask ChatGPT for a solution if you are unsure. There is a really short answer to this but we want to see what students come up with!
+
+```{r}
+
+#Create a table to display the number of each variable type
+
+table(sapply(C1survey, class))
+
+```
+
+5. a. Using code, check the bday and bmonth variables for any unusual or missing values (hint: use table function). If you find any, b. describe what you will do with the unusual values in a comment before or immediately following the code that does it, and c. after you have cleaned up any unusual values, find the median bday and month. *Note: please make sure that your bday and month variables are numeric before doing statistics
+
+```{r}
+
+#check bday variable values, correct format should be number only
+table(C1survey$bday)
+
+# Extract the first number in the string (the day) to fix format and change to numeric
+C1survey <- C1survey %>%
+  mutate(bday = as.numeric(str_extract(bday, "\\d+")))
+
+#check bmonth variable values
+table(C1survey$bmonth)
+
+#Change the months that are spelled out into their corresponding number and change to numeric
+C1survey <- C1survey %>%
+  mutate(bmonth = case_when(
+    bmonth == "January"  ~ 1,
+    bmonth == "February" ~ 2,
+    bmonth == "March"    ~ 3,
+    bmonth == "April"    ~ 4,
+    bmonth == "May"      ~ 5,
+    bmonth == "June"     ~ 6,
+    bmonth == "june"     ~ 6,
+    bmonth == "July"     ~ 7,
+    bmonth == "August"   ~ 8,
+    bmonth == "Septemeber"~ 9,
+    bmonth == "October"  ~ 10,
+    bmonth == "November" ~ 11,
+    bmonth == "December" ~ 12,
+    TRUE ~ as.numeric(bmonth) 
+  ))
+
+#check variable class and make sure it is changed to numeric
+class(C1survey$bday)
+class(C1survey$bmonth)
+
+
+#Find median values of bday and bmonth
+median(C1survey$bday, na.rm = TRUE)
+median(C1survey$bmonth, na.rm = TRUE)
+
+```
+
+6. 
+a. Create a new variable called bseason that gives the season according to Northern Meteorological season in which respondents were born (winter = 12/1 to 2/29, spring = 3/1 to 5/31, summer = 6/1 to 8/31, fall = 9/1 to 11/30). 
+b. Using the table function, print a table of Seasons in the columns and bmonths in the rows that allows you to check that the coding is correct 
+c. Sum the columns using the addmargins function to answer the question of how many classmates were born in each season? Include your answer in the code.
+
+```{r}
+
+#create bseason variable 
+
+C1survey <- C1survey %>%
+   mutate(
+    bseason = case_when(
+      (bmonth == 12 | bmonth <= 2) ~ "Winter",
+      (bmonth >= 3 & bmonth <= 5) ~ "Spring",
+      (bmonth >= 6 & bmonth <= 8) ~ "Summer",
+      (bmonth >= 9 & bmonth <= 11) ~ "Fall",
+      TRUE ~ NA_character_  # in case bmonth is NA
+    )
+  )
+
+#print table of seasons and months
+
+seasons_table <- table(C1survey$bmonth, C1survey$bseason)
+
+print(seasons_table)
+
+#Find number of people born in each season
+addmargins(seasons_table)
+
+##Number of people in class born per season
+#Fall = 15
+#Spring = 16
+#Summer = 16
+#Winter = 10
+
+```
+
+7. Pick your favorite variable or variables to analyze, come up with a question you want to answer with that variable or variables, generate the code, and provide an answer to your question. Describe what you did using comments (i.e. #’s).
+
+```{r}
+
+##Question: Does level of comfort in their coding ability correlate with how long they have been coding?
+
+#Create a table with coding_length as the columns and coding_comfort as the rows
+coding_table <- table(C1survey$coding_comfort, C1survey$coding_length)
+print(coding_table)
+
+#Add sums to the table to see the totals of how many people per coding_length and coding_comfort category
+addmargins(coding_table)
+
+##Results: Most people in the class (24 people) have little to no experience in R coding, and the majority of those with little experience responded with low comfort with R coding as well (coding_comfort = 1 or 2).
+
+```
+
